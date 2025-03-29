@@ -1,11 +1,11 @@
 {
   "name": "brazilian-boletos",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "license": "ISC",
-  "author": "",
+  "author": "Vinicius Soares <viniciussoaresaqw@hotmail.com>",
   "type": "commonjs",
-  "main": "src/boleto-gen.js",
+  "main": "src/index.js",
   "directories": {
     "src": "src",
     "test": "test"
@@ -25,5 +25,20 @@
     "@types/pdfkit": "^0.13.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ViniciusSoares-Developer/brazilian-boleto.git"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/ViniciusSoares-Developer/brazilian-boleto/issues"
+  },
+  "homepage": "https://github.com/ViniciusSoares-Developer/brazilian-boleto#readme"
 }

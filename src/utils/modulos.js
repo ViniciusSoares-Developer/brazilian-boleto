@@ -48,11 +48,11 @@ function calculaModulo11(bloco, banco) {
   const resto = soma % 11;
   const digito = 11 - resto;
 
-  if (banco === "bradesco") {
+  if (banco === Banco.BRADESCO) {
     if (digito === 0 || digito === 10 || digito === 11) {
       digito = 1; // Regra do Bradesco
     }
-  } else if (banco === "bancodobrasil") {
+  } else if (banco === Banco.BANCO_DO_BRASIL) {
     if (digito === 10) {
       digito = "X"; // Regra do Banco do Brasil
     } else if (digito === 11) {

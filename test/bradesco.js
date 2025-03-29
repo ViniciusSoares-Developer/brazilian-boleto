@@ -1,5 +1,5 @@
 const { addDays } = require("date-fns");
-const BoletoGenerator = require("../src/boleto-gen.js");
+const { BoletoGenerator } = require("../src/boleto-gen.js");
 const { Banco } = require("../src/enums.js");
 
 /**
@@ -10,7 +10,6 @@ async function gerarBoletoExemplo() {
     const gerador = new BoletoGenerator({
       banco: {
         codigo: Banco.BRADESCO,
-        nome: "Bradesco",
         agencia: "1234",
         conta: "56789-0",
         carteira: "9",
@@ -26,7 +25,7 @@ async function gerarBoletoExemplo() {
       },
       beneficiario: {
         nome: "Empresa XYZ Ltda",
-        cpfCnpj: "12.345.678/0001-90",
+        cpfCnpj: "54.927.997/0001-59",
         endereco: "Avenida Paulista, 1000",
         bairro: "Bela Vista",
         cidade: "São Paulo",
@@ -49,6 +48,7 @@ async function gerarBoletoExemplo() {
       },
     });
 
+    await gerador.gerarPDFFile();
     const pdf = await gerador.gerarPDFBuffer();
     console.log(pdf);
   } catch (error) {

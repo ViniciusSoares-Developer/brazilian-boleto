@@ -1,7 +1,8 @@
 const { formatarValorParaCodigo } = require("./formatacao.js");
-const { calcularFatorVencimento } = require("./calculo.js");
-const { calculaModulo11, calcularModulo10 } = require("./modulos.js");
+const { calcularFatorVencimento, calcularDvGeral } = require("./calculo.js");
+const { calcularModulo10 } = require("./modulos.js");
 const { linhaDigitavelValidator } = require("./validator.js");
+const { Banco } = require("../enums");
 
 /**
  * Gera a linha digitável para o Bradesco
@@ -13,26 +14,19 @@ function gerarLinhaDigitavel(dados) {
   const moeda = "9"; // Real
   const fator = calcularFatorVencimento(dados);
   const valor = formatarValorParaCodigo(dados.boleto.valor);
-  const agencia = dados.banco.agencia.padStart(4, "0");
-  const carteira = dados.banco.carteira.padStart(2, "0");
-  const nossoNumero = dados.boleto.nossoNumero.padStart(11, "0");
-  const conta = dados.banco.conta.replace(/\D/g, "").padStart(7, "0");
 
-  // Campo livre específico do Bradesco
-  const campoLivre = `${agencia}${carteira}${nossoNumero}${conta}0`;
+  // Gerar Campo Livre
+  const campoLivre = gerarCampoLivre(dados);
 
   // Código de barras
-  const codigoBarras = `${banco}${moeda}${fator}${valor}${campoLivre}`;
+  // const codigoBarras = `${banco}${moeda}${fator}${valor}${campoLivre}`;
 
   // Calcula o DV geral do código de barras
-  const dvGeral = calculaModulo11(
-    codigoBarras.substring(0, 4) + codigoBarras.substring(5),
-    dados.banco.codigo
-  );
+  const dvGeral = calcularDvGeral(dados, campoLivre);
 
   // Insere o DV geral na 5ª posição do código de barras
-  const codigoBarrasCompleto =
-    codigoBarras.substring(0, 4) + dvGeral + codigoBarras.substring(4);
+  // const codigoBarrasCompleto =
+  //   codigoBarras.substring(0, 4) + dvGeral + codigoBarras.substring(4);
 
   // Monta os campos da linha digitável
   const campo1 = `${banco}${moeda}${campoLivre.substring(0, 5)}`;
@@ -57,6 +51,27 @@ function gerarLinhaDigitavel(dados) {
   return linhaDigitavel;
 }
 
+/**
+ * @param {*} dados
+ * @returns {string}
+ */
+function gerarCampoLivre(dados) {
+  const agencia = dados.banco.agencia.padStart(4, "0");
+  const carteira = dados.banco.carteira.padStart(2, "0");
+  const nossoNumero = dados.boleto.nossoNumero.padStart(11, "0");
+  const conta = dados.banco.conta.replace(/\D/g, "").padStart(7, "0");
+
+  // Campo livre específico do Bradesco
+  if (dados.banco.codigo === Banco.BRADESCO) {
+    return `${agencia}${carteira}${nossoNumero}${conta}0`;
+  } else if (dados.banco.codigo === Banco.BANCO_DO_BRASIL) {
+    return `${agencia}${carteira}${nossoNumero}${conta}`;
+  } else {
+    throw new Error("Banco não suportado");
+  }
+}
+
 module.exports = {
   gerarLinhaDigitavel,
+  gerarCampoLivre,
 };

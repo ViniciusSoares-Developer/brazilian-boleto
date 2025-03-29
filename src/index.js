@@ -7,8 +7,14 @@ const {
   formatarMoeda,
   formatarValorParaCodigo,
 } = require("./utils/formatacao.js");
-const { gerarLinhaDigitavel } = require("./utils/linhaDigitavel.js");
-const { calcularFatorVencimento } = require("./utils/calculo.js");
+const {
+  gerarLinhaDigitavel,
+  gerarCampoLivre,
+} = require("./utils/linhaDigitavel.js");
+const {
+  calcularFatorVencimento,
+  calcularDvGeral,
+} = require("./utils/calculo.js");
 const {
   cnpjValidator,
   cpfValidator,
@@ -191,12 +197,6 @@ class BoletoGenerator {
       .font("Helvetica-Bold")
       .text("RECIBO DO PAGADOR", 450, 40, { align: "left" });
 
-    // Logo e código do banco
-    const nomeBanco =
-      this.dados.banco.codigo === Banco.BANCO_DO_BRASIL
-        ? "Banco do Brasil"
-        : "Bradesco";
-
     // Caixa para o código do banco
     doc.rect(30, 40, 80, 30).stroke();
     doc
@@ -293,8 +293,11 @@ class BoletoGenerator {
       195,
       y3 + 12
     );
+
     doc.text(
-      `${this.dados.banco.carteira}/${this.dados.boleto.nossoNumero}`,
+      `${this.dados.banco.carteira}/${
+        this.dados.boleto.nossoNumero
+      }-${calcularDvGeral(this.dados, gerarCampoLivre(this.dados))}`,
       445,
       y3 + 12
     );
@@ -446,7 +449,9 @@ class BoletoGenerator {
       y3 + 12
     );
     doc.text(
-      `${this.dados.banco.carteira}/${this.dados.boleto.nossoNumero}`,
+      `${this.dados.banco.carteira}/${
+        this.dados.boleto.nossoNumero
+      }-${calcularDvGeral(this.dados, gerarCampoLivre(this.dados))}`,
       475,
       y3 + 12
     );
@@ -474,76 +479,54 @@ class BoletoGenerator {
     doc.text("", 345, y4 + 12);
     doc.text(formatarMoeda(this.dados.boleto.valor), 455, y4 + 12);
 
-    // Linha 5 - Informações do beneficiário
+    // Linha 5 - Valor do documento, Descontos, Abatimentos, Outras Deduções, Juros / Multa, Outros Acréscimos, Valor Cobrado
     const y5 = y4 + 25;
-    this.desenharCampoDadoCabecalho(
-      doc,
-      "Informações de responsabilidade do beneficiário",
-      30,
-      y5,
-      420,
-      100
-    );
 
     // Descontos, juros, etc
     this.desenharCampoDadoCabecalho(
       doc,
       "(-) Desconto / Abatimento",
-      450,
+      30,
       y5,
-      130,
+      110,
       20
     );
     this.desenharCampoDadoCabecalho(
       doc,
       "(-) Outras Deduções",
-      450,
-      y5 + 20,
-      130,
+      140,
+      y5,
+      110,
       20
     );
-    this.desenharCampoDadoCabecalho(
-      doc,
-      "(+) Juros / Multa",
-      450,
-      y5 + 40,
-      130,
-      20
-    );
+    this.desenharCampoDadoCabecalho(doc, "(+) Juros / Multa", 250, y5, 110, 20);
     this.desenharCampoDadoCabecalho(
       doc,
       "(+) Outros Acréscimos",
-      450,
-      y5 + 60,
-      130,
+      360,
+      y5,
+      110,
       20
     );
+    this.desenharCampoDadoCabecalho(doc, "(=) Valor Cobrado", 470, y5, 110, 20);
+
+    // Linha 6 - Informações do beneficiário
+    const y6 = y5 + 20;
     this.desenharCampoDadoCabecalho(
       doc,
-      "(=) Valor Cobrado",
-      450,
-      y5 + 80,
-      130,
-      20
+      "Informações de responsabilidade do beneficiário",
+      30,
+      y6,
+      550,
+      100
     );
 
     // Instruções
-    let yInstrucao = y5 + 12;
+    let yInstrucao = y6 + 15;
     this.dados.boleto.instrucoes.forEach((instrucao) => {
-      doc.fontSize(9).text(instrucao, 35, yInstrucao);
+      doc.fontSize(9).text(instrucao.replace(".", ".\n"), 35, yInstrucao);
       yInstrucao += 15;
     });
-    doc
-      .fontSize(9)
-      .text(
-        "PAGAR PREFERENCIALMENTE NA REDE " +
-          (this.dados.banco.codigo === Banco.BANCO_DO_BRASIL
-            ? "BANCO DO BRASIL"
-            : "BRADESCO") +
-          ", OU EM QUALQUER BANCO ATÉ O VENCIMENTO",
-        35,
-        y5 + 70
-      );
   }
 
   /**
@@ -554,7 +537,7 @@ class BoletoGenerator {
    */
   async desenharCodigoBarras(doc) {
     const codigoBarras = await this.gerarCodigoBarras();
-    const y = 560; // Posição Y para o código de barras
+    const y = 600; // Posição Y para o código de barras
 
     doc.image(codigoBarras, 30, y, { width: 400, height: 50 });
   }
@@ -566,7 +549,7 @@ class BoletoGenerator {
    * @access private
    */
   desenharDadosPagador(doc) {
-    const y = 620;
+    const y = 670;
 
     this.desenharCampoDadoCabecalho(doc, "Pagador", 30, y, 550, 50);
 
