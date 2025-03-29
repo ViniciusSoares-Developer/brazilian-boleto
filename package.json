@@ -1,0 +1,25 @@
+{
+  "name": "brazilian-boletos",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.ts",
+  "scripts": {
+    "test": "node test/bradesco.ts"
+  },
+  "dependencies": {
+    "bwip-js": "^4.5.3",
+    "date-fns": "^4.1.0",
+    "fs-extra": "^11.3.0",
+    "pdfkit": "^0.16.0"
+  },
+  "devDependencies": {
+    "@types/bwip-js": "^3.2.3",
+    "@types/fs-extra": "^11.0.4",
+    "@types/pdfkit": "^0.13.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}
