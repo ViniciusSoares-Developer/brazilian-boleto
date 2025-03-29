@@ -3,57 +3,6 @@ const { calcularFatorVencimento } = require("./calculo.js");
 const { calculaModulo11, calcularModulo10 } = require("./modulos.js");
 const { linhaDigitavelValidator } = require("./validator.js");
 
-// /**
-//  * Gera a linha digitável para o Banco do Brasil
-//  * @param {*} dados
-//  * @returns {string}
-//  */
-// function gerarLinhaDigitavelBB(dados) {
-//   if (!dados.banco.convenio) {
-//     throw new Error("Convênio é obrigatório para o Banco do Brasil");
-//   }
-
-//   const banco = dados.banco.codigo.padStart(3, "0");
-//   const moeda = "9"; // Real
-//   const fator = calcularFatorVencimento(dados);
-//   const valor = formatarValorParaCodigo(dados.boleto.valor);
-//   const convenio = dados.banco.convenio.padStart(7, "0");
-//   const nossoNumero = dados.boleto.nossoNumero.padStart(10, "0");
-//   const agencia = dados.banco.agencia.padStart(4, "0");
-//   const conta = dados.banco.conta.replace(/\D/g, "").padStart(8, "0");
-
-//   // Campo livre específico do BB
-//   const campoLivre = `${agencia}${conta}${convenio}${nossoNumero}${dados.banco.carteira}`;
-
-//   // Código de barras
-//   const codigoBarrasSemDV = `${banco}${moeda}${fator}${valor}${campoLivre}`;
-//   const dvGeral = calculaModulo11(codigoBarrasSemDV);
-//   const codigoBarras = `${banco}${moeda}${dvGeral}${fator}${valor}${campoLivre}`;
-
-//   // Calcula dígitos verificadores dos blocos
-//   const bloco1 = `${banco}${moeda}${campoLivre.slice(0, 5)}`;
-//   const dv1 = calcularModulo10(bloco1);
-
-//   const bloco2 = `${campoLivre.slice(5, 15)}`;
-//   const dv2 = calcularModulo10(bloco2);
-
-//   const bloco3 = `${campoLivre.slice(15)}`;
-//   const dv3 = calcularModulo10(bloco3);
-
-//   const bloco4 = dvGeral;
-//   const bloco5 = fator + valor;
-
-//   const linhaDigitavel = `${bloco1}${dv1} ${bloco2}${dv2} ${bloco3}${dv3} ${bloco4} ${bloco5}`;
-
-//   console.log(linhaDigitavel.length);
-
-//   // Validar a linha digitável
-//   linhaDigitavelValidator(linhaDigitavel.replace(/\D/g, ""));
-
-//   // Formata a linha digitável
-//   return linhaDigitavel;
-// }
-
 /**
  * Gera a linha digitável para o Bradesco
  * @param {*} dados
@@ -77,7 +26,8 @@ function gerarLinhaDigitavel(dados) {
 
   // Calcula o DV geral do código de barras
   const dvGeral = calculaModulo11(
-    codigoBarras.substring(0, 4) + codigoBarras.substring(5)
+    codigoBarras.substring(0, 4) + codigoBarras.substring(5),
+    dados.banco.codigo
   );
 
   // Insere o DV geral na 5ª posição do código de barras

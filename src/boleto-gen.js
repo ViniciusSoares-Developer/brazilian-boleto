@@ -14,7 +14,7 @@ const {
   cpfValidator,
   carteiraValidator,
 } = require("./utils/validator.js");
-const { Banco } = require("./enums.js");
+const { Banco, Carteiras } = require("./enums.js");
 
 /**
  * Classe para geração de boletos
@@ -27,11 +27,11 @@ class BoletoGenerator {
     try {
       dados.banco.carteira = dados.banco.carteira.padStart(2, "0");
       carteiraValidator(dados.banco.codigo, dados.banco.carteira);
-      // if (dados.beneficiario.cpfCnpj.replace(/D/g, "").length === 11) {
-      //   cpfValidator(dados.beneficiario.cpfCnpj);
-      // } else {
-      //   cnpjValidator(dados.beneficiario.cpfCnpj);
-      // }
+      if (dados.beneficiario.cpfCnpj.replace(/D/g, "").length === 11) {
+        cpfValidator(dados.beneficiario.cpfCnpj);
+      } else {
+        cnpjValidator(dados.beneficiario.cpfCnpj);
+      }
       this.dados = dados;
     } catch (error) {
       throw new Error(error.message);
@@ -616,4 +616,7 @@ class BoletoGenerator {
   }
 }
 
-module.exports = BoletoGenerator;
+module.exports.BoletoGenerator = BoletoGenerator;
+
+module.exports.Banco = Banco;
+module.exports.Carteiras = Carteiras;

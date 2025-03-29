@@ -1,8 +1,8 @@
 declare module "brazilian-boletos" {
-  export const Banco: {
-    BANCO_DO_BRASIL: "001";
-    BRADESCO: "237";
-  };
+  export enum Banco {
+    BANCO_DO_BRASIL = "001",
+    BRADESCO = "237",
+  }
 
   export const Carteiras: {
     [key: string]: string[];
@@ -10,7 +10,7 @@ declare module "brazilian-boletos" {
 
   export interface BoletoInterface {
     banco: {
-      codigo: typeof Banco;
+      codigo: Banco;
       nome: string;
       agencia: string;
       conta: string;
@@ -19,7 +19,6 @@ declare module "brazilian-boletos" {
     };
     pagador: {
       nome: string;
-      cpfCnpj: string;
       endereco: string;
       bairro: string;
       cidade: string;
@@ -49,6 +48,8 @@ declare module "brazilian-boletos" {
   export class BoletoGenerator {
     constructor(dados: BoletoInterface);
 
-    async gerarPDF(outpath?: string): Promise<Buffer>;
+    async gerarPDFFile(outpath?: string): Promise<string>;
+
+    async gerarPDFBuffer(): Promise<Buffer>;
   }
 }

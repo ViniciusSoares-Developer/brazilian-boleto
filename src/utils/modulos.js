@@ -1,3 +1,5 @@
+const { Banco } = require("../enums");
+
 /**
  * Calcula o dígito verificador pelo módulo 10 de um número.
  * @param {string} numero - String contendo apenas dígitos numéricos.
@@ -23,11 +25,20 @@ function calcularModulo10(numero) {
 /**
  *
  * @param {string} bloco
+ * @param {string} banco
  * @returns {string}
  */
-function calculaModulo11(bloco) {
-  const multiplicadores = [2, 3, 4, 5, 6, 7, 8, 9];
+function calculaModulo11(bloco, banco) {
+  let multiplicadores = [2, 3, 4, 5, 6, 7, 8, 9];
   let soma = 0;
+
+  if (banco === Banco.BANCO_DO_BRASIL) {
+    multiplicadores = [2, 3, 4, 5, 6, 7, 8, 9]; // Regra do Banco do Brasil
+  } else if (banco === Banco.BRADESCO) {
+    multiplicadores = [2, 3, 4, 5, 6, 7]; // Regra do Bradesco
+  } else {
+    throw new Error("Banco não suportado");
+  }
 
   for (let i = bloco.length - 1, j = 0; i >= 0; i--, j++) {
     const digito = parseInt(bloco[i]);
@@ -37,8 +48,16 @@ function calculaModulo11(bloco) {
   const resto = soma % 11;
   const digito = 11 - resto;
 
-  if (digito === 0 || digito === 10 || digito === 11) {
-    return "1";
+  if (banco === "bradesco") {
+    if (digito === 0 || digito === 10 || digito === 11) {
+      digito = 1; // Regra do Bradesco
+    }
+  } else if (banco === "bancodobrasil") {
+    if (digito === 10) {
+      digito = "X"; // Regra do Banco do Brasil
+    } else if (digito === 11) {
+      digito = 0;
+    }
   }
 
   return digito.toString();
