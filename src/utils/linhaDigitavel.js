@@ -18,8 +18,6 @@ function gerarLinhaDigitavel(dados) {
   // Gerar Campo Livre
   const campoLivre = gerarCampoLivre(dados);
 
-  console.log(campoLivre);
-
   // Calcula o DV geral do código de barras
   const dvGeral = calcularDvGeral(dados, campoLivre);
 
@@ -38,8 +36,6 @@ function gerarLinhaDigitavel(dados) {
   const campo5 = `${fator}${valor}`;
 
   const linhaDigitavel = `${campo1}${dvCampo1} ${campo2}${dvCampo2} ${campo3}${dvCampo3} ${campo4} ${campo5}`;
-
-  console.log(linhaDigitavel);
 
   // Validar a linha digitável
   linhaDigitavelValidator(linhaDigitavel.replace(/\D/g, ""));
