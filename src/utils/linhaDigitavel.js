@@ -18,15 +18,10 @@ function gerarLinhaDigitavel(dados) {
   // Gerar Campo Livre
   const campoLivre = gerarCampoLivre(dados);
 
-  // Código de barras
-  // const codigoBarras = `${banco}${moeda}${fator}${valor}${campoLivre}`;
+  console.log(campoLivre);
 
   // Calcula o DV geral do código de barras
   const dvGeral = calcularDvGeral(dados, campoLivre);
-
-  // Insere o DV geral na 5ª posição do código de barras
-  // const codigoBarrasCompleto =
-  //   codigoBarras.substring(0, 4) + dvGeral + codigoBarras.substring(4);
 
   // Monta os campos da linha digitável
   const campo1 = `${banco}${moeda}${campoLivre.substring(0, 5)}`;
@@ -43,6 +38,8 @@ function gerarLinhaDigitavel(dados) {
   const campo5 = `${fator}${valor}`;
 
   const linhaDigitavel = `${campo1}${dvCampo1} ${campo2}${dvCampo2} ${campo3}${dvCampo3} ${campo4} ${campo5}`;
+
+  console.log(linhaDigitavel);
 
   // Validar a linha digitável
   linhaDigitavelValidator(linhaDigitavel.replace(/\D/g, ""));
@@ -65,7 +62,11 @@ function gerarCampoLivre(dados) {
   if (dados.banco.codigo === Banco.BRADESCO) {
     return `${agencia}${carteira}${nossoNumero}${conta}0`;
   } else if (dados.banco.codigo === Banco.BANCO_DO_BRASIL) {
-    return `${agencia}${carteira}${nossoNumero}${conta}`;
+    if (nossoNumero.length === 11) {
+      return `${agencia}${carteira}${nossoNumero}${conta}`;
+    } else if (nossoNumero.length === 17) {
+      return `000000${nossoNumero}${carteira}`;
+    }
   } else {
     throw new Error("Banco não suportado");
   }

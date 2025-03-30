@@ -95,15 +95,16 @@ class BoletoGenerator {
     if (!outputPath) {
       outputPath = path.join(
         process.cwd(),
+        "tmp",
         "boletos",
-        `boleto-${this.dados.boleto.numeroDocumento}.pdf`
+        `boleto-${this.dados.boleto.numeroDocumento.replace(/\//g, "-")}.pdf`
       );
+    }
 
-      // Garante que o diretório exista
-      const diretorio = path.dirname(outputPath);
-      if (!fs.existsSync(diretorio)) {
-        fs.mkdirSync(diretorio, { recursive: true });
-      }
+    // Garante que o diretório exista
+    const diretorio = path.dirname(outputPath);
+    if (!fs.existsSync(diretorio)) {
+      fs.mkdirSync(diretorio, { recursive: true });
     }
 
     // Cria o PDF

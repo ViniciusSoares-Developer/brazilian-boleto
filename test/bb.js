@@ -1,5 +1,5 @@
 const { addDays } = require("date-fns");
-const BoletoGenerator = require("../src/boleto-gen.js");
+const { BoletoGenerator } = require("../src/index.js");
 const { Banco } = require("../src/enums.js");
 
 /**
@@ -9,7 +9,6 @@ async function gerarBoletoExemplo() {
   const gerador = new BoletoGenerator({
     banco: {
       codigo: Banco.BANCO_DO_BRASIL,
-      nome: "Banco do Brasil",
       agencia: "5678",
       conta: "98765-4",
       carteira: "17",
@@ -25,7 +24,7 @@ async function gerarBoletoExemplo() {
     },
     beneficiario: {
       nome: "Empresa XYZ Ltda",
-      cpfCnpj: "12.345.678/0001-90",
+      cpfCnpj: "54.927.997/0001-59",
       endereco: "Avenida Paulista, 1000",
       bairro: "Bela Vista",
       cidade: "São Paulo",
@@ -33,7 +32,7 @@ async function gerarBoletoExemplo() {
       cep: "01310-100",
     },
     boleto: {
-      nossoNumero: "00234567890",
+      nossoNumero: "33099360000151448",
       numeroDocumento: "12346",
       dataVencimento: addDays(new Date(), 30),
       dataEmissao: new Date(),
