@@ -9,6 +9,6 @@ module.exports.Banco = Banco;
  */
 const Carteiras = {
   "001": ["11", "12", "15", "16", "17", "18"],
-  237: ["02", "03", "04", "05", "09", "", ""],
+  237: ["02", "03", "04", "05", "09"],
 };
 module.exports.Carteiras = Carteiras;

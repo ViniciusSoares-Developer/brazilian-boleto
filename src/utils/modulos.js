@@ -32,7 +32,7 @@ function calculaModulo11(bloco, banco) {
   let multiplicadores;
 
   if (banco === Banco.BANCO_DO_BRASIL) {
-    multiplicadores = [2, 3, 4, 5, 6, 7, 9]; // Regra do Banco do Brasil ciclica
+    multiplicadores = [2, 3, 4, 5, 6, 7, 8]; // Regra do Banco do Brasil ciclica
   } else if (banco === Banco.BRADESCO) {
     multiplicadores = [7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5]; // Regra do Bradesco fixa
   } else {

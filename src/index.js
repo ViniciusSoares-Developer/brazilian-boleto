@@ -295,13 +295,14 @@ class BoletoGenerator {
       y3 + 12
     );
 
-    doc.text(
-      `${this.dados.banco.carteira}/${
-        this.dados.boleto.nossoNumero
-      }-${calcularDvGeral(this.dados, gerarCampoLivre(this.dados))}`,
-      445,
-      y3 + 12
-    );
+    const nossoNumero = `${this.dados.banco.carteira}/${this.dados.boleto.nossoNumero}`;
+
+    if (this.dados.banco.codigo === Banco.BRADESCO) {
+      nossoNumero +=
+        "-" + calcularDvGeral(this.dados, gerarCampoLivre(this.dados));
+    }
+
+    doc.text(nossoNumero, 445, y3 + 12);
 
     // Espaço para Autenticação Mecânica
     doc.fontSize(8).font("Helvetica").text("Autenticação Mecânica", 400, 220);
@@ -525,8 +526,10 @@ class BoletoGenerator {
     // Instruções
     let yInstrucao = y6 + 15;
     this.dados.boleto.instrucoes.forEach((instrucao) => {
-      doc.fontSize(9).text(instrucao.replace(".", ".\n"), 35, yInstrucao);
-      yInstrucao += 15;
+      if (instrucao) {
+        doc.fontSize(9).text(instrucao, 35, yInstrucao);
+        yInstrucao += 15;
+      }
     });
   }
 

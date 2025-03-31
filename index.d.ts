@@ -11,7 +11,6 @@ declare module "brazilian-boletos" {
   export interface BoletoInterface {
     banco: {
       codigo: Banco;
-      nome: string;
       agencia: string;
       conta: string;
       carteira: string;
