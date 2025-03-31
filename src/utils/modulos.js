@@ -49,11 +49,8 @@ function calculaModulo11(bloco, banco) {
     if (digito === 0 || digito === 10 || digito === 11) return "1";
     return digito.toString();
   } else if (banco === Banco.BANCO_DO_BRASIL) {
-    if (resto === 0 || resto === 1) {
-      return "0";
-    } else {
-      return digito.toString();
-    }
+    if (digito === 0 || digito === 10 || digito === 11) return "1";
+    return digito.toString();
   } else {
     throw new Error("Banco não suportado");
   }

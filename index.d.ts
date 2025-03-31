@@ -14,7 +14,6 @@ declare module "brazilian-boletos" {
       agencia: string;
       conta: string;
       carteira: string;
-      convenio?: string;
     };
     pagador: {
       nome: string;
