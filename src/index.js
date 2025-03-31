@@ -11,16 +11,14 @@ const {
   gerarLinhaDigitavel,
   gerarCampoLivre,
 } = require("./utils/linhaDigitavel.js");
-const {
-  calcularFatorVencimento,
-  calcularDvGeral,
-} = require("./utils/calculo.js");
+const { calcularFatorVencimento } = require("./utils/calculo.js");
 const {
   cnpjValidator,
   cpfValidator,
   carteiraValidator,
 } = require("./utils/validator.js");
 const { Banco, Carteiras } = require("./enums.js");
+const { dvNossoNumero, calculaModulo11 } = require("./utils/modulos.js");
 
 /**
  * Classe para geração de boletos
@@ -39,6 +37,8 @@ class BoletoGenerator {
         cnpjValidator(dados.beneficiario.cpfCnpj);
       }
       this.dados = dados;
+      this.linhaDigitavel =
+        dados.boleto.linhaDigitavel || gerarLinhaDigitavel(this.dados);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -53,14 +53,14 @@ class BoletoGenerator {
     const moeda = "9";
     const fator = calcularFatorVencimento(this.dados);
     const valor = formatarValorParaCodigo(this.dados.boleto.valor);
-    const campoLivre = `${this.dados.banco.agencia}${
-      this.dados.banco.carteira
-    }${this.dados.boleto.nossoNumero}${this.dados.banco.conta.replace(
-      /\D/g,
-      ""
-    )}`;
 
-    const codigoBarras = `${banco}${moeda}${fator}${valor}${campoLivre}`;
+    const campoLivre = gerarCampoLivre(this.dados);
+    const dv = calculaModulo11(
+      `${banco}${moeda}${fator}${valor}${campoLivre}`,
+      this.dados.banco.codigo
+    );
+
+    const codigoBarras = `${banco}${moeda}${dv}${fator}${valor}${campoLivre}`;
 
     return new Promise((resolve, reject) => {
       bwipjs.toBuffer(
@@ -295,11 +295,12 @@ class BoletoGenerator {
       y3 + 12
     );
 
-    const nossoNumero = `${this.dados.banco.carteira}/${this.dados.boleto.nossoNumero}`;
+    let nossoNumero = `${this.dados.banco.carteira}/${this.dados.boleto.nossoNumero}`;
 
     if (this.dados.banco.codigo === Banco.BRADESCO) {
       nossoNumero +=
-        "-" + calcularDvGeral(this.dados, gerarCampoLivre(this.dados));
+        "-" +
+        dvNossoNumero(this.dados.boleto.nossoNumero, this.dados.banco.codigo);
     }
 
     doc.text(nossoNumero, 445, y3 + 12);
@@ -307,11 +308,7 @@ class BoletoGenerator {
     // Espaço para Autenticação Mecânica
     doc.fontSize(8).font("Helvetica").text("Autenticação Mecânica", 400, 220);
 
-    // Linha Digitável
-    let linhaDigitavel =
-      this.dados.boleto.linhaDigitavel || gerarLinhaDigitavel(this.dados);
-
-    doc.fontSize(11).font("Helvetica-Bold").text(linhaDigitavel, 145, 250);
+    doc.fontSize(11).font("Helvetica-Bold").text(this.linhaDigitavel, 145, 250);
   }
 
   /**
@@ -359,14 +356,10 @@ class BoletoGenerator {
         y + 10
       );
 
-    // Linha digitável
-    let linhaDigitavel =
-      this.dados.boleto.linhaDigitavel || gerarLinhaDigitavel(this.dados);
-
     doc
       .fontSize(11)
       .font("Helvetica-Bold")
-      .text(linhaDigitavel, 145, y + 10);
+      .text(this.linhaDigitavel, 145, y + 10);
   }
 
   /**
@@ -450,13 +443,15 @@ class BoletoGenerator {
       375,
       y3 + 12
     );
-    doc.text(
-      `${this.dados.banco.carteira}/${
-        this.dados.boleto.nossoNumero
-      }-${calcularDvGeral(this.dados, gerarCampoLivre(this.dados))}`,
-      475,
-      y3 + 12
-    );
+
+    let nossoNumero = `${this.dados.banco.carteira}/${this.dados.boleto.nossoNumero}`;
+    if (this.dados.banco.codigo === Banco.BRADESCO) {
+      nossoNumero +=
+        "-" +
+        dvNossoNumero(this.dados.boleto.nossoNumero, this.dados.banco.codigo);
+    }
+
+    doc.text(nossoNumero, 475, y3 + 12);
 
     // Linha 4 - Uso do Banco, CIP, Carteira, Moeda, Quantidade, Valor
     const y4 = y3 + 25;

@@ -1,6 +1,6 @@
 const { formatarValorParaCodigo } = require("./formatacao.js");
-const { calcularFatorVencimento, calcularDvGeral } = require("./calculo.js");
-const { calcularModulo10 } = require("./modulos.js");
+const { calcularFatorVencimento } = require("./calculo.js");
+const { calcularModulo10, calculaModulo11 } = require("./modulos.js");
 const { linhaDigitavelValidator } = require("./validator.js");
 const { Banco } = require("../enums");
 
@@ -18,8 +18,10 @@ function gerarLinhaDigitavel(dados) {
   // Gerar Campo Livre
   const campoLivre = gerarCampoLivre(dados);
 
+  const codigoBarras = gerarCodigoBarras(dados, campoLivre);
+
   // Calcula o DV geral do código de barras
-  const dvGeral = calcularDvGeral(dados, campoLivre);
+  const dvGeral = calculaModulo11(codigoBarras, dados.banco.codigo);
 
   // Monta os campos da linha digitável
   const campo1 = `${banco}${moeda}${campoLivre.substring(0, 5)}`;
@@ -59,13 +61,26 @@ function gerarCampoLivre(dados) {
     return `${agencia}${carteira}${nossoNumero}${conta}0`;
   } else if (dados.banco.codigo === Banco.BANCO_DO_BRASIL) {
     if (nossoNumero.length === 11) {
-      return `${agencia}${carteira}${nossoNumero}${conta}`;
+      return `${nossoNumero}${agencia}${conta}${carteira}`;
     } else if (nossoNumero.length === 17) {
       return `000000${nossoNumero}${carteira}`;
     }
   } else {
     throw new Error("Banco não suportado");
   }
+}
+
+/**
+ *
+ */
+function gerarCodigoBarras(dados, campoLivre) {
+  const banco = dados.banco.codigo.padStart(3, "0");
+  const moeda = "9"; // Real
+  const fator = calcularFatorVencimento(dados);
+  const valor = formatarValorParaCodigo(dados.boleto.valor);
+
+  // Código de barras
+  return `${banco}${moeda}${fator}${valor}${campoLivre}`;
 }
 
 module.exports = {

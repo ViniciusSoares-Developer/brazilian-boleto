@@ -35,6 +35,7 @@ declare module "brazilian-boletos" {
     };
     boleto: {
       nossoNumero: string;
+      linhaDigitavel?: string;
       numeroDocumento: string;
       dataVencimento: Date;
       dataEmissao: Date;

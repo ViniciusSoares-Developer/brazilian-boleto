@@ -29,15 +29,7 @@ function calcularModulo10(numero) {
  * @returns {string}
  */
 function calculaModulo11(bloco, banco) {
-  let multiplicadores;
-
-  if (banco === Banco.BANCO_DO_BRASIL) {
-    multiplicadores = [2, 3, 4, 5, 6, 7, 8]; // Regra do Banco do Brasil ciclica
-  } else if (banco === Banco.BRADESCO) {
-    multiplicadores = [7, 6, 5, 4, 3, 2, 9, 8, 7, 6, 5]; // Regra do Bradesco fixa
-  } else {
-    throw new Error("Banco não suportado");
-  }
+  let multiplicadores = [2, 3, 4, 5, 6, 7, 8, 9]; // Regra padrão
 
   let soma = 0;
   let pesoIndex = 0;
@@ -54,9 +46,8 @@ function calculaModulo11(bloco, banco) {
   const digito = 11 - resto;
 
   if (banco === Banco.BRADESCO) {
-    const resultado = 11 - digito;
-    if (resultado === 0 || resultado === 10 || resultado === 11) return "1";
-    return resultado.toString();
+    if (digito === 0 || digito === 10 || digito === 11) return "1";
+    return digito.toString();
   } else if (banco === Banco.BANCO_DO_BRASIL) {
     if (resto === 0 || resto === 1) {
       return "0";
@@ -68,7 +59,27 @@ function calculaModulo11(bloco, banco) {
   }
 }
 
+function dvNossoNumero(nossoNumero, banco) {
+  let multiplicadores;
+
+  if (banco === Banco.BRADESCO) {
+    multiplicadores = [2, 7, 6, 5, 4, 3, 2];
+  } else {
+    throw new Error("Banco não suportado");
+  }
+
+  let sum = 0;
+  for (let i = 0; i < nossoNumero.length; i++) {
+    const digito = parseInt(nossoNumero[i], 10);
+    const peso = multiplicadores[i % multiplicadores.length];
+    sum += digito * peso;
+  }
+
+  return 11 - (sum % 11);
+}
+
 module.exports = {
   calculaModulo11,
   calcularModulo10,
+  dvNossoNumero,
 };

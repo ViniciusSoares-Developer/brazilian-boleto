@@ -27,29 +27,6 @@ function calcularFatorVencimento(dados) {
   return diferencaDias.toString().padStart(4, "0");
 }
 
-/**
- *
- * @param {*} dados
- * @param {string} campoLivre
- * @returns {string}
- */
-function calcularDvGeral(dados, campoLivre) {
-  const banco = dados.banco.codigo.padStart(3, "0");
-  const moeda = "9"; // Real
-  const fator = calcularFatorVencimento(dados);
-  const valor = formatarValorParaCodigo(dados.boleto.valor);
-
-  // Código de barras
-  const codigoBarras = `${banco}${moeda}${fator}${valor}${campoLivre}`;
-
-  // Calcula o DV geral do código de barras
-  return calculaModulo11(
-    codigoBarras.substring(0, 4) + codigoBarras.substring(5),
-    dados.banco.codigo
-  );
-}
-
 module.exports = {
   calcularFatorVencimento,
-  calcularDvGeral,
 };
