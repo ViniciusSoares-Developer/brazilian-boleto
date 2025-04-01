@@ -119,4 +119,5 @@ module.exports = {
   cnpjValidator,
   linhaDigitavelValidator,
   carteiraValidator,
+  isValidDate,
 };
