@@ -12,13 +12,7 @@ npm install brazilian-boletos
 import { BoletoGenerator, Banco } from "brazilian-boletos";
 
 const boletoGenerator = new BoletoGenerator({
-  banco: {
-    codigo: Banco.BRADESCO,
-    nome: "Bradesco",
-    agencia: "1234",
-    conta: "56789-0",
-    carteira: "9",
-  },
+  banco: Banco.BRADESCO,
   pagador: {
     nome: "Nome",
     cpfCnpj: "123.456.789-00",
@@ -36,6 +30,9 @@ const boletoGenerator = new BoletoGenerator({
     cidade: "São Paulo",
     uf: "SP",
     cep: "01310-100",
+    agencia: "1234",
+    conta: "56789-0",
+    carteira: "9",
   },
   boleto: {
     nossoNumero: "00123456789",

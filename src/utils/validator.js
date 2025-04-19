@@ -1,5 +1,3 @@
-const { Carteiras } = require("../enums.js");
-
 /**
  * @param {string} cpf
  * @returns string
@@ -104,13 +102,16 @@ function linhaDigitavelValidator(linhaDigitavel) {
 }
 
 /**
- *
  * @param {string} banco
- * @param {string} carteira
+ * @returns {void}
  */
-function carteiraValidator(banco, carteira) {
-  if (!Carteiras[banco].includes(carteira)) {
-    throw new Error("Carteira inválida");
+function codigoDeBarrasValidator(codigoDeBarras) {
+  // Verifica se o código de barras tem 44 caracteres
+  if (codigoDeBarras.length !== 44) {
+    throw new Error(
+      "Código de barras inválido, deve ter 44 caracteres e tem " +
+        codigoDeBarras.length
+    );
   }
 }
 
@@ -118,5 +119,5 @@ module.exports = {
   cpfValidator,
   cnpjValidator,
   linhaDigitavelValidator,
-  carteiraValidator,
+  codigoDeBarrasValidator,
 };

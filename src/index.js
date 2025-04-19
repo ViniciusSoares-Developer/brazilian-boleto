@@ -2,23 +2,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 const PDFKit = require("pdfkit");
 const bwipjs = require("bwip-js");
-const {
-  formatarData,
-  formatarMoeda,
-  formatarValorParaCodigo,
-} = require("./utils/formatacao.js");
-const {
-  gerarLinhaDigitavel,
-  gerarCampoLivre,
-} = require("./utils/linhaDigitavel.js");
-const { calcularFatorVencimento } = require("./utils/calculo.js");
-const {
-  cnpjValidator,
-  cpfValidator,
-  carteiraValidator,
-} = require("./utils/validator.js");
-const { Banco, Carteiras } = require("./enums.js");
-const { dvNossoNumero, calculaModulo11 } = require("./utils/modulos.js");
+const { formatarData, formatarMoeda } = require("./utils/formatacao.js");
+const { cnpjValidator, cpfValidator } = require("./utils/validator.js");
+const Banco = require("./bancos/index.js");
 
 const pdfConfig = {
   PDFKit: { size: "A4", margin: 20 },
@@ -41,17 +27,19 @@ class BoletoGenerator {
    */
   constructor(dados) {
     try {
-      dados.banco.carteira = dados.banco.carteira.padStart(2, "0");
-      carteiraValidator(dados.banco.codigo, dados.banco.carteira);
+      dados.banco.carteira = dados.beneficiario.carteira.padStart(2, "0");
       if (dados.beneficiario.cpfCnpj.replace(/D/g, "").length === 11) {
         cpfValidator(dados.beneficiario.cpfCnpj);
       } else {
         cnpjValidator(dados.beneficiario.cpfCnpj);
       }
       this.dados = dados;
-      this.linhaDigitavel =
-        dados.boleto.linhaDigitavel || gerarLinhaDigitavel(this.dados);
+      const banco = this.dados.banco;
+      banco.setData(this.dados.boleto, this.dados.beneficiario);
+      this.linhaDigitavel = banco.linhaDigitavel();
+      this.codigoDeBarras = banco.codigoDeBarrasCompleto();
     } catch (error) {
+      console.log(error);
       throw new Error(error.message);
     }
   }
@@ -61,24 +49,11 @@ class BoletoGenerator {
    * @returns {Promise<Buffer>}
    */
   async gerarCodigoBarras() {
-    const banco = this.dados.banco.codigo.padStart(3, "0");
-    const moeda = "9";
-    const fator = calcularFatorVencimento(this.dados);
-    const valor = formatarValorParaCodigo(this.dados.boleto.valor);
-
-    const campoLivre = gerarCampoLivre(this.dados);
-    const dv = calculaModulo11(
-      `${banco}${moeda}${fator}${valor}${campoLivre}`,
-      this.dados.banco.codigo
-    );
-
-    const codigoBarras = `${banco}${moeda}${dv}${fator}${valor}${campoLivre}`;
-
     return new Promise((resolve, reject) => {
       bwipjs.toBuffer(
         {
           bcid: "interleaved2of5",
-          text: codigoBarras,
+          text: this.codigoDeBarras,
           scale: 3,
           height: 10,
           includetext: false,
@@ -484,12 +459,7 @@ class BoletoGenerator {
         },
         {
           title: "Nosso Número",
-          value:
-            banco !== Banco.BANCO_DO_BRASIL
-              ? `${this.dados.banco.carteira}/${
-                  this.dados.boleto.nossoNumero
-                }-${dvNossoNumero(this.dados.boleto.nossoNumero, banco)}`
-              : this.dados.boleto.nossoNumero,
+          value: this.dados.boleto.nossoNumero,
           width: 150,
         },
       ],
@@ -705,4 +675,3 @@ class BoletoGenerator {
 module.exports.BoletoGenerator = BoletoGenerator;
 
 module.exports.Banco = Banco;
-module.exports.Carteiras = Carteiras;

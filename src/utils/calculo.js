@@ -1,17 +1,14 @@
-const { calculaModulo11 } = require("./modulos.js");
-const { formatarValorParaCodigo } = require("./formatacao.js");
-
 /**
- * @param {*} dados
+ * @param {Date} dataVencimento
  * @returns {string}
  */
-function calcularFatorVencimento(dados) {
+function calcularFatorVencimento(dataVencimento) {
   const dataBase = new Date(2022, 4, 29);
-  const dataVencimento = dados.boleto.dataVencimento;
 
   // Obtém a diferença em dias
   const diferencaDias = Math.floor(
-    (dataVencimento.getTime() - dataBase.getTime()) / (1000 * 60 * 60 * 24)
+    (new Date(dataVencimento).getTime() - dataBase.getTime()) /
+      (1000 * 60 * 60 * 24)
   );
 
   if (diferencaDias < 0) {

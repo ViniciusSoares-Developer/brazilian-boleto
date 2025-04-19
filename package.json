@@ -1,6 +1,6 @@
 {
   "name": "brazilian-boletos",
-  "version": "1.1.81",
+  "version": "2.0.0",
   "description": "Biblioteca para geração de boletos bancários brasileiros.",
   "license": "AGPL-3.0",
   "author": "Vinicius Soares <viniciussoaresaqw@hotmail.com>",
